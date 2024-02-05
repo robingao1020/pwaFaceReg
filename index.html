@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition PWA</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        #video-container {
+            position: relative;
+            width: 100%;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 2px solid #00ff00;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video" width="100%" height="auto" autoplay playsinline></video>
+        <canvas id="overlay" width="100%" height="auto"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <script src="app.js"></script>
+</body>
+</html>
