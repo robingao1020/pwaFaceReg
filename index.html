@@ -6,9 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Detection PWA</title>
     <link rel="manifest" href="/manifest.json">
+    <style>
+        #video {
+            width: 100%;
+            height: auto;
+        }
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 2px solid #00ff00;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-    <video id="webcam" width="640" height="480"></video>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="overlay" width="100%" height="auto"></canvas>
 
     <script src="https://unpkg.com/face-api.js"></script>
     <script src="main.js"></script>

@@ -1,10 +1,11 @@
 {
     "name": "Face Detection PWA",
-    "short_name": "FaceDetectPWA",
+    "short_name": "Face PWA",
+    "description": "Detect faces using PWA",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#000000",
+    "theme_color": "#3498db",
     "icons": [
       {
         "src": "icon.png",
