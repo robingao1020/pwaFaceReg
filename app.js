@@ -1,4 +1,5 @@
 // app.js
+
 async function setupCamera() {
     const video = document.getElementById('video');
     const stream = await navigator.mediaDevices.getUserMedia({ 'video': {} });
@@ -12,27 +13,35 @@ async function setupCamera() {
 }
 
 async function loadFaceLandmarksModel() {
-    return faceLandmarksDetection.load(
-        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
-    );
+    const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
+    const detectorConfig = {
+        runtime: 'mediapipe', // or 'tfjs'
+        solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
+    };
+    return faceLandmarksDetection.createDetector(model, detectorConfig);
 }
 
-function detectFaceLandmarks(video, model) {
+async function detectFaceLandmarks(video, detector) {
     const overlay = document.getElementById('overlay');
     const canvas = overlay.getContext('2d');
 
     async function renderPrediction() {
-        const predictions = await model.estimateFaces({
-            input: video
-        });
+        const faces = await detector.estimateFaces(video);
 
         canvas.clearRect(0, 0, video.width, video.height);
 
-        if (predictions.length > 0) {
-            const keypoints = predictions[0].scaledMesh;
+        for (const face of faces) {
+            const boundingBox = face.box;
+            const keypoints = face.scaledMesh;
 
-            for (let i = 0; i < keypoints.length; i++) {
-                const [x, y] = keypoints[i];
+            // Draw bounding box
+            canvas.strokeStyle = '#00FF00';
+            canvas.lineWidth = 2;
+            canvas.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+
+            // Draw keypoints
+            for (const point of keypoints) {
+                const [x, y] = point;
                 canvas.fillStyle = '#00FF00';
                 canvas.fillRect(x, y, 2, 2);
             }
@@ -46,9 +55,9 @@ function detectFaceLandmarks(video, model) {
 
 async function run() {
     const video = await setupCamera();
-    const model = await loadFaceLandmarksModel();
+    const detector = await loadFaceLandmarksModel();
 
-    detectFaceLandmarks(video, model);
+    detectFaceLandmarks(video, detector);
 }
 
 run();
