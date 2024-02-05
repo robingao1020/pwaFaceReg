@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video');
     const overlay = document.getElementById('overlay');
     const captureButton = document.getElementById('capture-button');
-    
+
     let stream;
     let photo;
 
@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function detectFace() {
         const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
         const canvas = faceapi.selectCanvas(overlay);
+
+        // Set canvas size to match video size
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, detections);
