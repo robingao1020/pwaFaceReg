@@ -1,43 +1,45 @@
-// main.js
-const video = document.getElementById('video');
-const overlay = document.getElementById('overlay');
-const constraints = { video: true };
+document.addEventListener('DOMContentLoaded', async () => {
+    const video = document.getElementById('video');
+    const overlay = document.getElementById('overlay');
+    const model = await faceLandmarksDetection.load(
+        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
+    );
 
-navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-        video.addEventListener('loadedmetadata', () => {
-            startVideo();
+
+        video.addEventListener('loadeddata', () => {
+            setInterval(async () => {
+                const predictions = await model.estimateFaces({
+                    input: video
+                });
+
+                if (predictions.length > 0) {
+                    const face = predictions[0].scaledMesh;
+
+                    // Clear previous drawings
+                    overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+
+                    // Draw face landmarks
+                    drawFaceLandmarks(face, overlay);
+                }
+            }, 100);
         });
-    })
-    .catch((err) => {
-        console.error(err);
-    });
+    }
+});
 
-function startVideo() {
-    video.addEventListener('play', () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.width;
-        canvas.height = video.height;
-        document.body.append(canvas);
+function drawFaceLandmarks(face, canvas) {
+    const ctx = canvas.getContext('2d');
 
-        const context = canvas.getContext('2d');
+    ctx.beginPath();
+    for (let i = 0; i < face.length; i++) {
+        const x = face[i][0];
+        const y = face[i][1];
 
-        const render = async () => {
-            context.drawImage(video, 0, 0, video.width, video.height);
-            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            for (const detection of detections) {
-                const box = detection.box;
-                context.strokeStyle = '#00FF00';
-                context.lineWidth = 2;
-                context.strokeRect(box.x, box.y, box.width, box.height);
-            }
-
-            requestAnimationFrame(render);
-        };
-
-        render();
-    });
+        ctx.arc(x, y, 2, 0, 2 * Math.PI);
+        ctx.fillStyle = '#00ff00';
+        ctx.fill();
+    }
+    ctx.closePath();
 }
