@@ -26,18 +26,18 @@ async function detectFaceLandmarks(video, detector) {
 
     async function renderPrediction() {
         const faces = await detector.estimateFaces(video);
-
+    
         canvas.clearRect(0, 0, video.width, video.height);
-
+    
         for (const face of faces) {
             const boundingBox = face.box;
             const keypoints = face.scaledMesh;
-
+    
             // Draw bounding box
             canvas.strokeStyle = '#00FF00';
             canvas.lineWidth = 2;
             canvas.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-
+    
             // Draw keypoints
             for (const point of keypoints) {
                 const [x, y] = point;
@@ -45,10 +45,12 @@ async function detectFaceLandmarks(video, detector) {
                 canvas.fillRect(x, y, 2, 2);
             }
         }
-
+    
+        // Request the next animation frame
         requestAnimationFrame(renderPrediction);
     }
-
+    
+    // Start the rendering loop
     renderPrediction();
 }
 
