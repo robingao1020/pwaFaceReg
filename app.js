@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const video = document.getElementById('video');
     const overlay = document.getElementById('overlay');
     const captureButton = document.getElementById('capture-button');
@@ -56,12 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // You can do something with the captured photo, like sending it to a server for face recognition.
         console.log('Photo captured:', photo);
     }
-
-    // Set video width and height after metadata loaded
-    video.addEventListener('loadedmetadata', () => {
-        video.width = video.videoWidth;
-        video.height = video.videoHeight;
-    });
 
     initCamera();
 });
