@@ -1,6 +1,6 @@
 {
-    "name": "Face Recognition PWA",
-    "short_name": "FaceRecPWA",
+    "name": "Face Detection PWA",
+    "short_name": "FaceDetectPWA",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Recognition PWA</title>
+    <title>Face Detection PWA</title>
     <link rel="manifest" href="/manifest.json">
     <style>
         #video-container {
@@ -19,6 +19,16 @@
             box-sizing: border-box;
             pointer-events: none;
         }
+
+        #capture-button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -27,8 +37,8 @@
         <canvas id="overlay" width="100%" height="auto"></canvas>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <button id="capture-button">Capture Photo</button>
+
     <script src="app.js"></script>
 </body>
 </html>
