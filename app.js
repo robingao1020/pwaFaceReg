@@ -1,61 +1,38 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    const video = document.getElementById('video');
-    const overlay = document.getElementById('overlay');
-    const captureButton = document.getElementById('capture-button');
+// main.js
+const webcam = document.getElementById('webcam');
+const constraints = { video: true };
 
-    let stream;
-    let photo;
+navigator.mediaDevices.getUserMedia(constraints)
+  .then((stream) => { webcam.srcObject = stream; })
+  .catch((err) => { console.error(err); });
 
-    captureButton.addEventListener('click', () => {
-        takePhoto();
-    });
+Promise.all([
+  faceapi.nets.tinyFaceDetector.loadFromUri('./models')
+]).then(startVideo);
 
-    async function initCamera() {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            video.addEventListener('loadedmetadata', () => {
-                setupCanvas();
-                detectFace();
-            });
-        } catch (error) {
-            console.error('Error accessing camera:', error);
-        }
-    }
+function startVideo() {
+  webcam.addEventListener('play', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = webcam.width;
+    canvas.height = webcam.height;
+    document.body.append(canvas);
 
-    function setupCanvas() {
-        const canvas = faceapi.createCanvasFromMedia(video);
-        overlay.appendChild(canvas);
-    }
+    const context = canvas.getContext('2d');
 
-    async function detectFace() {
-        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-        const canvas = faceapi.selectCanvas(overlay);
+    const render = async () => {
+      context.drawImage(webcam, 0, 0, webcam.width, webcam.height);
+      const detections = await faceapi.detectAllFaces(webcam, new faceapi.TinyFaceDetectorOptions());
+      
+      for (const detection of detections) {
+        const box = detection.box;
+        context.strokeStyle = '#00FF00';
+        context.lineWidth = 2;
+        context.strokeRect(box.x, box.y, box.width, box.height);
+      }
 
-        // Set canvas size to match video size
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      requestAnimationFrame(render);
+    };
 
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-        faceapi.draw.drawDetections(canvas, detections);
-        faceapi.draw.drawFaceLandmarks(canvas, detections);
-
-        // Continue detecting in the next frame
-        requestAnimationFrame(() => detectFace());
-    }
-
-    function takePhoto() {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        photo = canvas.toDataURL('image/png');
-
-        // You can do something with the captured photo, like sending it to a server for face recognition.
-        console.log('Photo captured:', photo);
-    }
-
-    initCamera();
-});
+    render();
+  });
+}
