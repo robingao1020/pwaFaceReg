@@ -1,16 +1,17 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Recognition PWA</title>
+    <title>Face Detection PWA</title>
     <link rel="manifest" href="/manifest.json">
     <style>
-        #video-container {
-            position: relative;
+        #video {
             width: 100%;
+            height: auto;
+            transform: scaleX(-1); /* Flip the video horizontally for better user experience */
         }
-
         #overlay {
             position: absolute;
             top: 0;
@@ -22,12 +23,12 @@
     </style>
 </head>
 <body>
-    <div id="video-container">
-        <video id="video" width="100%" height="auto" autoplay playsinline></video>
-        <canvas id="overlay" width="100%" height="auto"></canvas>
-    </div>
+    <video id="video" width="100%" height="auto" autoplay playsinline></video>
+    <canvas id="overlay" width="100%" height="auto"></canvas>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
     <script src="app.js"></script>
 </body>

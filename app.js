@@ -1,8 +1,7 @@
 // app.js
-
 async function setupCamera() {
     const video = document.getElementById('video');
-    const stream = await navigator.mediaDevices.getUserMedia({ 'video': {} });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
     video.srcObject = stream;
 
     return new Promise((resolve) => {
@@ -15,7 +14,7 @@ async function setupCamera() {
 async function loadFaceLandmarksModel() {
     const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
     const detectorConfig = {
-        runtime: 'mediapipe', // or 'tfjs'
+        runtime: 'mediapipe',
         solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
     };
     return faceLandmarksDetection.createDetector(model, detectorConfig);
