@@ -57,5 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Photo captured:', photo);
     }
 
+    // Set video width and height after metadata loaded
+    video.addEventListener('loadedmetadata', () => {
+        video.width = video.videoWidth;
+        video.height = video.videoHeight;
+    });
+
     initCamera();
 });
