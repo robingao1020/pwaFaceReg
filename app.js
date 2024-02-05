@@ -1,45 +1,54 @@
-document.addEventListener('DOMContentLoaded', async () => {
+// app.js
+async function setupCamera() {
     const video = document.getElementById('video');
-    const overlay = document.getElementById('overlay');
-    const model = await faceLandmarksDetection.load(
+    const stream = await navigator.mediaDevices.getUserMedia({ 'video': {} });
+    video.srcObject = stream;
+
+    return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+            resolve(video);
+        };
+    });
+}
+
+async function loadFaceLandmarksModel() {
+    return faceLandmarksDetection.load(
         faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
     );
-
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-
-        video.addEventListener('loadeddata', () => {
-            setInterval(async () => {
-                const predictions = await model.estimateFaces({
-                    input: video
-                });
-
-                if (predictions.length > 0) {
-                    const face = predictions[0].scaledMesh;
-
-                    // Clear previous drawings
-                    overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
-
-                    // Draw face landmarks
-                    drawFaceLandmarks(face, overlay);
-                }
-            }, 100);
-        });
-    }
-});
-
-function drawFaceLandmarks(face, canvas) {
-    const ctx = canvas.getContext('2d');
-
-    ctx.beginPath();
-    for (let i = 0; i < face.length; i++) {
-        const x = face[i][0];
-        const y = face[i][1];
-
-        ctx.arc(x, y, 2, 0, 2 * Math.PI);
-        ctx.fillStyle = '#00ff00';
-        ctx.fill();
-    }
-    ctx.closePath();
 }
+
+function detectFaceLandmarks(video, model) {
+    const overlay = document.getElementById('overlay');
+    const canvas = overlay.getContext('2d');
+
+    async function renderPrediction() {
+        const predictions = await model.estimateFaces({
+            input: video
+        });
+
+        canvas.clearRect(0, 0, video.width, video.height);
+
+        if (predictions.length > 0) {
+            const keypoints = predictions[0].scaledMesh;
+
+            for (let i = 0; i < keypoints.length; i++) {
+                const [x, y] = keypoints[i];
+                canvas.fillStyle = '#00FF00';
+                canvas.fillRect(x, y, 2, 2);
+            }
+        }
+
+        requestAnimationFrame(renderPrediction);
+    }
+
+    renderPrediction();
+}
+
+async function run() {
+    const video = await setupCamera();
+    const model = await loadFaceLandmarksModel();
+
+    detectFaceLandmarks(video, model);
+}
+
+run();
