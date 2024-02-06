@@ -58,6 +58,7 @@ async function detectFaceLandmarks(video, detector) {
             canvas.clearRect(0, 0, video.width, video.height);
 
             for (const face of faces) {
+<<<<<<< HEAD
                 const boundingBox = face.box;
                 const keypoints = face.scaledMesh;
             
@@ -72,6 +73,9 @@ async function detectFaceLandmarks(video, detector) {
                     canvas.fillStyle = '#00FF00';
                     canvas.fillRect(x - 2, y - 2, 4, 4); // Draw a small rectangle around each keypoint
                 }
+=======
+                // ... 绘制人脸框和关键点的逻辑 ...
+>>>>>>> 1010823c50e2b00d6de8df6e2d18e8a4857ae08f
             }
 
             // Request the next animation frame
