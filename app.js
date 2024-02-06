@@ -107,10 +107,15 @@ async function main() {
     displayLog('Initializing...');
 
     try {
-        await setupCamera();
-        await setupCanvas();
-        model = await loadFaceLandmarkDetectionModel();
-        renderPrediction();
+        // 同時啟動 setupCamera、setupCanvas 和 loadFaceLandmarkDetectionModel
+        const [videoElement] = await Promise.all([
+            setupCamera(),
+            setupCanvas(),
+            loadFaceLandmarkDetectionModel()
+        ]);
+
+        // 將 video 元素傳遞給 renderPrediction 函式
+        renderPrediction(videoElement);
     } catch (error) {
         displayLog(`Error during initialization: ${error.message}`);
     }
