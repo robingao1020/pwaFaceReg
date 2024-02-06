@@ -46,8 +46,8 @@ async function renderPrediction() {
         video, 0, 0, video.width, video.height, 0, 0, canvas.width, canvas.height);
 
     if(predictions.length > 0) {
-        predictions.forEach(prediction => {
-            const keypoints = prediction.scaledMesh;
+        // predictions.forEach(prediction => {
+            // const keypoints = prediction.scaledMesh;
             // for (let i = 0; i < keypoints.length; i++) {
             //     const x = keypoints[i][0];
             //     const y = keypoints[i][1];
@@ -56,7 +56,7 @@ async function renderPrediction() {
             //     ctx.arc(x, y, 2, 0, 2 * Math.PI);
             //     ctx.fill();
             // }
-        });
+        // });
     }
 
     window.requestAnimationFrame(renderPrediction);
