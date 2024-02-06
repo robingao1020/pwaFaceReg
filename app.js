@@ -43,7 +43,7 @@ async function loadFaceLandmarksModel() {
 
 async function detectFaceLandmarks(video, detector) {
     const overlay = document.getElementById('overlay');
-    // const canvas = overlay.getContext('2d');
+    const ctx = overlay.getContext('2d');
 
     async function renderPrediction() {
         try {
@@ -54,47 +54,33 @@ async function detectFaceLandmarks(video, detector) {
                 predictIrises: false
             });
 
-            ctx.drawImage(
-                video, 0, 0, video.width, video.height, 0, 0, canvas.width, canvas.height);
+            // 清除整个 canvas
+            ctx.clearRect(0, 0, overlay.width, overlay.height);
 
+            // 绘制图像
+            ctx.drawImage(
+                video, 0, 0, video.width, video.height, 0, 0, overlay.width, overlay.height);
 
             if (faces.length > 0) {
                 displayLog('Detected faces:', faces);
-                faces.forEach(faces => {
-                    const keypoints = faces.scaledMesh;
+                faces.forEach(face => {
+                    const keypoints = face.scaledMesh;
                     for (let i = 0; i < keypoints.length; i++) {
-                        const x = keypoints[i][0];
-                        const y = keypoints[i][1];
-        
+                        const [x, y, z] = keypoints[i];
+
+                        // Draw a colored circle around each keypoint
                         ctx.beginPath();
-                        ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#FF0000'; // Red color
                         ctx.fill();
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = '#FFFFFF'; // White color
+                        ctx.stroke();
                     }
                 });
 
             } else {
                 displayLog('No faces detected.');
-            }
-
-            canvas.clearRect(0, 0, video.width, video.height);
-
-
-            for (const face of faces) {
-                
-
-                // Draw keypoints
-                for (const [index, point] of keypoints) {
-                    const [x, y, z] = point;
-
-                    // Draw a colored circle around each keypoint
-                    canvas.beginPath();
-                    canvas.arc(x, y, 4, 0, 2 * Math.PI);
-                    canvas.fillStyle = '#FF0000'; // Red color
-                    canvas.fill();
-                    canvas.lineWidth = 1;
-                    canvas.strokeStyle = '#FFFFFF'; // White color
-                    canvas.stroke();
-                }
             }
 
             // Request the next animation frame
@@ -108,8 +94,6 @@ async function detectFaceLandmarks(video, detector) {
     displayLog('Rendering loop started');
     renderPrediction();
 }
-
-
 
 async function run() {
     displayLog('Initializing...');
