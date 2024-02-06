@@ -1,128 +1,79 @@
-// app.js
-
-function displayLog(message) {
-    const logContainer = document.getElementById('log');
-    const logMessage = document.createElement('p');
-    logMessage.textContent = message;
-    logContainer.appendChild(logMessage);
-}
-
-// Override console.log to also display logs in the #log div
-console.log = function() {
-    for (let i = 0; i < arguments.length; i++) {
-        displayLog(arguments[i]);
-    }
-};
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+let ctx;
+let videoWidth, videoHeight; 
 
 async function setupCamera() {
-    displayLog('Setting up camera...');
-    const video = document.getElementById('video');
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-        video.srcObject = stream;
-
-        return new Promise((resolve) => {
-            video.onloadedmetadata = () => {
-                displayLog('Camera setup complete');
-                resolve(video);
-            };
-        });
-    } catch (error) {
-        displayLog(`Error setting up camera: ${error.message}`);
-    }
+    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+    video.srcObject = stream;
+    return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+            videoWidth = video.videoWidth;
+            videoHeight = video.videoHeight;
+            video.width = videoWidth;
+            video.height = videoHeight;
+            resolve(video);
+        }; 
+    });
 }
 
-async function loadFaceLandmarksModel() {
-    displayLog('Loading face landmarks model...');
+async function setupCanvas() {
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
 
-    try {
-        const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
-        const detectorConfig = {
-            runtime: 'mediapipe',
-            solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
-        };
-        return faceLandmarksDetection.createDetector(model, detectorConfig);
-    } catch (error) {
-        displayLog(`Error loading face landmarks model: ${error.message}`);
-    }
+    ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+
+    ctx.fillStyle = "green";
 }
 
-async function detectFaceLandmarks(video, detector) {
-    const overlay = document.getElementById('overlay');
-    const ctx = overlay.getContext('2d');
+async function loadFaceLandmarkDetectionModel() {
+    return faceLandmarksDetection
+                .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+                      {maxFaces: 1});
+}
 
-    async function renderPrediction() {
-        try {
-            const faces = await detector.estimateFaces({
-                input: video,
-                returnTensors: false,
-                flipHorizontal: false,
-                predictIrises: false
-            });
+async function renderPrediction() {
+    const predictions = await model.estimateFaces({
+        input: video,
+        returnTensors: false,
+        flipHorizontal: false,
+        predictIrises: false
+    });
 
-            // 清除整个 canvas
-            ctx.clearRect(0, 0, overlay.width, overlay.height);
+    ctx.drawImage(
+        video, 0, 0, video.width, video.height, 0, 0, canvas.width, canvas.height);
 
-            // 绘制图像
-            ctx.drawImage(
-                video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, overlay.width, overlay.height);
+    if(predictions.length > 0) {
+        predictions.forEach(prediction => {
+            const keypoints = prediction.scaledMesh;
+            for (let i = 0; i < keypoints.length; i++) {
+                const x = keypoints[i][0];
+                const y = keypoints[i][1];
 
-            if (faces.length > 0) {
-                displayLog('Detected faces:', faces);
-                faces.forEach(face => {
-                    const keypoints = face.scaledMesh;
-                    displayLog('Keypoints:', keypoints);
-
-                    for (let i = 0; i < keypoints.length; i++) {
-                        const [x, y, z] = keypoints[i];
-
-                        // 绘制颜色点
-                        displayLog(`Drawing color point at (${x}, ${y})`);
-                        ctx.beginPath();
-                        ctx.arc(x, y, 4, 0, 2 * Math.PI);
-                        ctx.fillStyle = 'rgba(255, 0, 0, 1)'; // Red color with alpha channel
-                        ctx.fill();
-                    }
-                });
-            } else {
-                displayLog('No faces detected.');
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                ctx.fill();
             }
-
-            // 请求下一帧动画
-            requestAnimationFrame(renderPrediction);
-        } catch (error) {
-            displayLog(`Error detecting face landmarks: ${error.message}`);
-        }
+        });
     }
 
-    // 开始渲染循环
-    displayLog('Rendering loop started');
-    try {
-        // 在这里添加一个 displayLog，确保 renderPrediction 正常执行
-        displayLog('Attempting to execute renderPrediction');
-        renderPrediction();
-    } catch (error) {
-        displayLog(`Error starting rendering loop: ${error.message}`);
-    }
+    window.requestAnimationFrame(renderPrediction);
+}
+
+async function main() {
+    //Set up camera
+    await setupCamera();
+
+    //Set up canvas
+    await setupCanvas();
+
+    //Load the model
+    model = await loadFaceLandmarkDetectionModel();
+
+    //Render Face Mesh Prediction
     renderPrediction();
 }
 
-async function run() {
-    displayLog('Initializing...');
-
-    try {
-        const video = await setupCamera();
-        const detector = await loadFaceLandmarksModel();
-
-        if (video && detector) {
-            detectFaceLandmarks(video, detector);
-        } else {
-            displayLog('Failed to initialize camera or face landmarks model.');
-        }
-    } catch (error) {
-        displayLog(`Error during initialization: ${error.message}`);
-    }
-}
-
-run();
+main();
