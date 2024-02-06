@@ -72,10 +72,13 @@ async function detectFaceLandmarks(video, detector) {
                 displayLog('Detected faces:', faces);
                 faces.forEach(face => {
                     const keypoints = face.scaledMesh;
+                    displayLog('Keypoints:', keypoints);
+
                     for (let i = 0; i < keypoints.length; i++) {
                         const [x, y, z] = keypoints[i];
-                    
+
                         // 绘制颜色点
+                        displayLog(`Drawing color point at (${x}, ${y})`);
                         ctx.beginPath();
                         ctx.arc(x, y, 4, 0, 2 * Math.PI);
                         ctx.fillStyle = 'rgba(255, 0, 0, 1)'; // Red color with alpha channel
