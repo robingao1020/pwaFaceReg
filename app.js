@@ -49,22 +49,28 @@ async function detectFaceLandmarks(video, detector) {
         try {
             const faces = await detector.estimateFaces(video);
 
+            if (faces.length > 0) {
+                displayLog('Detected faces:', faces);
+            } else {
+                displayLog('No faces detected.');
+            }
+
             canvas.clearRect(0, 0, video.width, video.height);
 
             for (const face of faces) {
                 const boundingBox = face.box;
                 const keypoints = face.scaledMesh;
-
+            
                 // Draw bounding box
                 canvas.strokeStyle = '#00FF00';
                 canvas.lineWidth = 2;
                 canvas.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-
+            
                 // Draw keypoints
                 for (const point of keypoints) {
                     const [x, y] = point;
                     canvas.fillStyle = '#00FF00';
-                    canvas.fillRect(x, y, 2, 2);
+                    canvas.fillRect(x - 2, y - 2, 4, 4); // Draw a small rectangle around each keypoint
                 }
             }
 
