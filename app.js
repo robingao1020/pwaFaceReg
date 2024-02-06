@@ -58,7 +58,21 @@ async function detectFaceLandmarks(video, detector) {
             canvas.clearRect(0, 0, video.width, video.height);
 
             for (const face of faces) {
+                const keypoints = face.scaledMesh;
 
+                // Draw keypoints
+                for (const point of keypoints) {
+                    const [x, y] = point;
+
+                    // Draw a colored circle around each keypoint
+                    canvas.beginPath();
+                    canvas.arc(x, y, 4, 0, 2 * Math.PI);
+                    canvas.fillStyle = '#FF0000'; // Red color
+                    canvas.fill();
+                    canvas.lineWidth = 1;
+                    canvas.strokeStyle = '#FFFFFF'; // White color
+                    canvas.stroke();
+                }
             }
 
             // Request the next animation frame
@@ -72,7 +86,6 @@ async function detectFaceLandmarks(video, detector) {
     displayLog('Rendering loop started');
     renderPrediction();
 }
-
 async function run() {
     displayLog('Initializing...');
 
