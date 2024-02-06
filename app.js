@@ -10,25 +10,35 @@ function displayLog(message) {
 async function setupCamera() {
     displayLog('Setting up camera...');
     const video = document.getElementById('video');
-    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-    video.srcObject = stream;
 
-    return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-            displayLog('Camera setup complete');
-            resolve(video);
-        };
-    });
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+        video.srcObject = stream;
+
+        return new Promise((resolve) => {
+            video.onloadedmetadata = () => {
+                displayLog('Camera setup complete');
+                resolve(video);
+            };
+        });
+    } catch (error) {
+        displayLog(`Error setting up camera: ${error.message}`);
+    }
 }
 
 async function loadFaceLandmarksModel() {
     displayLog('Loading face landmarks model...');
-    const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
-    const detectorConfig = {
-        runtime: 'mediapipe',
-        solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
-    };
-    return faceLandmarksDetection.createDetector(model, detectorConfig);
+
+    try {
+        const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
+        const detectorConfig = {
+            runtime: 'mediapipe',
+            solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
+        };
+        return faceLandmarksDetection.createDetector(model, detectorConfig);
+    } catch (error) {
+        displayLog(`Error loading face landmarks model: ${error.message}`);
+    }
 }
 
 async function detectFaceLandmarks(video, detector) {
@@ -36,29 +46,33 @@ async function detectFaceLandmarks(video, detector) {
     const canvas = overlay.getContext('2d');
 
     async function renderPrediction() {
-        const faces = await detector.estimateFaces(video);
+        try {
+            const faces = await detector.estimateFaces(video);
 
-        canvas.clearRect(0, 0, video.width, video.height);
+            canvas.clearRect(0, 0, video.width, video.height);
 
-        for (const face of faces) {
-            const boundingBox = face.box;
-            const keypoints = face.scaledMesh;
+            for (const face of faces) {
+                const boundingBox = face.box;
+                const keypoints = face.scaledMesh;
 
-            // Draw bounding box
-            canvas.strokeStyle = '#00FF00';
-            canvas.lineWidth = 2;
-            canvas.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+                // Draw bounding box
+                canvas.strokeStyle = '#00FF00';
+                canvas.lineWidth = 2;
+                canvas.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
 
-            // Draw keypoints
-            for (const point of keypoints) {
-                const [x, y] = point;
-                canvas.fillStyle = '#00FF00';
-                canvas.fillRect(x, y, 2, 2);
+                // Draw keypoints
+                for (const point of keypoints) {
+                    const [x, y] = point;
+                    canvas.fillStyle = '#00FF00';
+                    canvas.fillRect(x, y, 2, 2);
+                }
             }
-        }
 
-        // Request the next animation frame
-        requestAnimationFrame(renderPrediction);
+            // Request the next animation frame
+            requestAnimationFrame(renderPrediction);
+        } catch (error) {
+            displayLog(`Error detecting face landmarks: ${error.message}`);
+        }
     }
 
     // Start the rendering loop
@@ -68,10 +82,19 @@ async function detectFaceLandmarks(video, detector) {
 
 async function run() {
     displayLog('Initializing...');
-    const video = await setupCamera();
-    const detector = await loadFaceLandmarksModel();
 
-    detectFaceLandmarks(video, detector);
+    try {
+        const video = await setupCamera();
+        const detector = await loadFaceLandmarksModel();
+
+        if (video && detector) {
+            detectFaceLandmarks(video, detector);
+        } else {
+            displayLog('Failed to initialize camera or face landmarks model.');
+        }
+    } catch (error) {
+        displayLog(`Error during initialization: ${error.message}`);
+    }
 }
 
 run();
