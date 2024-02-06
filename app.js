@@ -29,9 +29,9 @@ async function setupCanvas() {
 }
 
 async function loadFaceLandmarkDetectionModel() {
-    return faceLandmarksDetection
-                .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
-                      {maxFaces: 1});
+    // return faceLandmarksDetection
+    //             .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+    //                   {maxFaces: 1});
 }
 
 async function renderPrediction() {
