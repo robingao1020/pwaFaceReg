@@ -43,7 +43,7 @@ async function loadFaceLandmarksModel() {
 
 async function detectFaceLandmarks(video, detector) {
     const overlay = document.getElementById('overlay');
-    const canvas = overlay.getContext('2d');
+    // const canvas = overlay.getContext('2d');
 
     async function renderPrediction() {
         try {
