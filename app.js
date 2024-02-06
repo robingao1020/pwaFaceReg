@@ -47,18 +47,40 @@ async function detectFaceLandmarks(video, detector) {
 
     async function renderPrediction() {
         try {
-            const faces = await detector.estimateFaces(video);
+            const faces = await detector.estimateFaces({
+                input: video,
+                returnTensors: false,
+                flipHorizontal: false,
+                predictIrises: false
+            });
+
+            ctx.drawImage(
+                video, 0, 0, video.width, video.height, 0, 0, canvas.width, canvas.height);
+
 
             if (faces.length > 0) {
                 displayLog('Detected faces:', faces);
+                faces.forEach(faces => {
+                    const keypoints = faces.scaledMesh;
+                    for (let i = 0; i < keypoints.length; i++) {
+                        const x = keypoints[i][0];
+                        const y = keypoints[i][1];
+        
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                });
+
             } else {
                 displayLog('No faces detected.');
             }
 
             canvas.clearRect(0, 0, video.width, video.height);
 
+
             for (const face of faces) {
-                const keypoints = Object.entries(face.scaledMesh);
+                
 
                 // Draw keypoints
                 for (const [index, point] of keypoints) {
