@@ -7,6 +7,13 @@ function displayLog(message) {
     logContainer.appendChild(logMessage);
 }
 
+// Override console.log to also display logs in the #log div
+console.log = function() {
+    for (let i = 0; i < arguments.length; i++) {
+        displayLog(arguments[i]);
+    }
+};
+
 async function setupCamera() {
     displayLog('Setting up camera...');
     const video = document.getElementById('video');
@@ -59,7 +66,7 @@ async function detectFaceLandmarks(video, detector) {
 
             // 绘制图像
             ctx.drawImage(
-                video, 0, 0, video.width, video.height, 0, 0, overlay.width, overlay.height);
+                video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, overlay.width, overlay.height);
 
             if (faces.length > 0) {
                 displayLog('Detected faces:', faces);
@@ -68,7 +75,7 @@ async function detectFaceLandmarks(video, detector) {
                     for (let i = 0; i < keypoints.length; i++) {
                         const [x, y, z] = keypoints[i];
 
-                        // Draw a colored circle around each keypoint
+                        // 绘制颜色点
                         ctx.beginPath();
                         ctx.arc(x, y, 4, 0, 2 * Math.PI);
                         ctx.fillStyle = '#FF0000'; // Red color
@@ -78,20 +85,19 @@ async function detectFaceLandmarks(video, detector) {
                         ctx.stroke();
                     }
                 });
-
             } else {
                 displayLog('No faces detected.');
             }
 
-            // Request the next animation frame
+            // 请求下一帧动画
             requestAnimationFrame(renderPrediction);
         } catch (error) {
             displayLog(`Error detecting face landmarks: ${error.message}`);
         }
     }
 
-    // Start the rendering loop
-    displayLog('Rendering loop star ted');
+    // 开始渲染循环
+    displayLog('Rendering loop started');
     renderPrediction();
 }
 
