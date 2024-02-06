@@ -74,15 +74,12 @@ async function detectFaceLandmarks(video, detector) {
                     const keypoints = face.scaledMesh;
                     for (let i = 0; i < keypoints.length; i++) {
                         const [x, y, z] = keypoints[i];
-
+                    
                         // 绘制颜色点
                         ctx.beginPath();
                         ctx.arc(x, y, 4, 0, 2 * Math.PI);
-                        ctx.fillStyle = '#FF0000'; // Red color
+                        ctx.fillStyle = 'rgba(255, 0, 0, 1)'; // Red color with alpha channel
                         ctx.fill();
-                        ctx.lineWidth = 1;
-                        ctx.strokeStyle = '#FFFFFF'; // White color
-                        ctx.stroke();
                     }
                 });
             } else {
