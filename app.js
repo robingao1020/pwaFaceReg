@@ -29,9 +29,9 @@ async function setupCanvas() {
 }
 
 async function loadFaceLandmarkDetectionModel() {
-    // return faceLandmarksDetection
-    //             .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
-    //                   {maxFaces: 1});
+    return faceLandmarksDetection
+                .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+                      {maxFaces: 1});
 }
 
 async function renderPrediction() {
@@ -46,17 +46,17 @@ async function renderPrediction() {
         video, 0, 0, video.width, video.height, 0, 0, canvas.width, canvas.height);
 
     if(predictions.length > 0) {
-        // predictions.forEach(prediction => {
-            // const keypoints = prediction.scaledMesh;
-            // for (let i = 0; i < keypoints.length; i++) {
-            //     const x = keypoints[i][0];
-            //     const y = keypoints[i][1];
+        predictions.forEach(prediction => {
+            const keypoints = prediction.scaledMesh;
+            for (let i = 0; i < keypoints.length; i++) {
+                const x = keypoints[i][0];
+                const y = keypoints[i][1];
 
-            //     ctx.beginPath();
-            //     ctx.arc(x, y, 2, 0, 2 * Math.PI);
-            //     ctx.fill();
-            // }
-        // });
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        });
     }
 
     window.requestAnimationFrame(renderPrediction);
