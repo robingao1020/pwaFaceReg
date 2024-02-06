@@ -98,6 +98,13 @@ async function detectFaceLandmarks(video, detector) {
 
     // 开始渲染循环
     displayLog('Rendering loop started');
+    try {
+        // 在这里添加一个 displayLog，确保 renderPrediction 正常执行
+        displayLog('Attempting to execute renderPrediction');
+        renderPrediction();
+    } catch (error) {
+        displayLog(`Error starting rendering loop: ${error.message}`);
+    }
     renderPrediction();
 }
 
