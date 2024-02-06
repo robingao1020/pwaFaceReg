@@ -58,10 +58,10 @@ async function detectFaceLandmarks(video, detector) {
             canvas.clearRect(0, 0, video.width, video.height);
 
             for (const face of faces) {
-                const keypoints = Object.values(face.scaledMesh);
+                const keypoints = Object.entries(face.scaledMesh);
 
                 // Draw keypoints
-                for (const point of keypoints) {
+                for (const [index, point] of keypoints) {
                     const [x, y, z] = point;
 
                     // Draw a colored circle around each keypoint
@@ -86,6 +86,7 @@ async function detectFaceLandmarks(video, detector) {
     displayLog('Rendering loop started');
     renderPrediction();
 }
+
 
 
 async function run() {
