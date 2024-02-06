@@ -91,7 +91,7 @@ async function detectFaceLandmarks(video, detector) {
     }
 
     // Start the rendering loop
-    displayLog('Rendering loop started');
+    displayLog('Rendering loop star ted');
     renderPrediction();
 }
 

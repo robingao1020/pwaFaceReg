@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,6 +42,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <!-- Include additional script for handling logs -->
+    <script>
+        // Function to display logs in the #log div
+        function displayLog(message) {
+            const logContainer = document.getElementById('log');
+            const logMessage = document.createElement('p');
+            logMessage.textContent = message;
+            logContainer.appendChild(logMessage);
+        }
+
+        // Override console.log to also display logs in the #log div
+        console.log = function() {
+            for (let i = 0; i < arguments.length; i++) {
+                displayLog(arguments[i]);
+            }
+        };
+    </script>
     <script src="app.js"></script>
 </body>
 </html>
